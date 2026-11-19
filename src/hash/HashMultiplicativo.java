@@ -15,13 +15,20 @@ public class HashMultiplicativo implements FuncaoHash {
 
     @Override
     public int indice(String chave, int capacidade) {
-        // TODO [Cauê - P1]: implementar.
-        //  1. Converter a string em um inteiro k (ex.: somar/combinar os códigos dos caracteres).
-        //  2. Calcular a parte fracionária de k * A.
-        //  3. Multiplicar por capacidade e truncar.
-        //  Cuidado com k negativo (overflow): usar Math.abs ou (k & 0x7fffffff).
-        //  Justificar a escolha no relatório (seção 2.1).
-        throw new UnsupportedOperationException("TODO [Cauê - P1]: HashMultiplicativo.indice");
+        if (capacidade <= 0) {
+            throw new IllegalArgumentException("capacidade deve ser > 0");
+        }
+        if (chave == null || chave.isEmpty()) {
+            return 0;
+        }
+        int k = 0;
+        for (int i = 0; i < chave.length(); i++) {
+            k = k * 31 + chave.charAt(i);
+        }
+        long kPositivo = k & 0x7fffffffL;
+        double prod = kPositivo * A;
+        double frac = prod - Math.floor(prod);
+        return (int) Math.floor(capacidade * frac);
     }
 
     @Override

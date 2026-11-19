@@ -15,9 +15,20 @@ public class HashPolinomial implements FuncaoHash {
 
     @Override
     public int indice(String chave, int capacidade) {
-        // TODO [Cauê - P1]: implementar com a regra de Horner,
-        //  aplicando o "mod capacidade" a cada passo para evitar overflow.
-        throw new UnsupportedOperationException("TODO [Cauê - P1]: HashPolinomial.indice");
+        if (capacidade <= 0) {
+            throw new IllegalArgumentException("capacidade deve ser > 0");
+        }
+        if (chave == null || chave.isEmpty()) {
+            return 0;
+        }
+        long h = 0;
+        for (int i = 0; i < chave.length(); i++) {
+            h = (h * BASE + chave.charAt(i)) % capacidade;
+        }
+        if (h < 0) {
+            h += capacidade;
+        }
+        return (int) h;
     }
 
     @Override

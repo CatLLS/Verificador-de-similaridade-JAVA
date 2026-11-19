@@ -1,5 +1,9 @@
 package texto;
 
+import hash.HashPolinomial;
+import hash.TabelaHash;
+import hash.TabelaHashEncadeada;
+
 /**
  * Lista pré-definida de stop words do português.
  *
@@ -31,6 +35,7 @@ public class StopWords {
     };
 
     private final String[] palavras;
+    private final TabelaHash tabela;
 
     public StopWords() {
         this(LISTA_PADRAO);
@@ -38,13 +43,20 @@ public class StopWords {
 
     public StopWords(String[] palavras) {
         this.palavras = palavras.clone();
-        // TODO [Cauê - P1]: preparar a estrutura de consulta (ordenar, ou inserir numa TabelaHash).
+        this.tabela = new TabelaHashEncadeada(new HashPolinomial(), 257);
+        for (String p : this.palavras) {
+            if (p != null && !p.isEmpty()) {
+                this.tabela.incrementar(p);
+            }
+        }
     }
 
     /** @return true se o token (já em minúsculas) for stop word. */
     public boolean eStopWord(String token) {
-        // TODO [Cauê - P1]: implementar a consulta.
-        throw new UnsupportedOperationException("TODO [Cauê - P1]: StopWords.eStopWord");
+        if (token == null || token.isEmpty()) {
+            return false;
+        }
+        return tabela.contem(token);
     }
 
     public int tamanho() {

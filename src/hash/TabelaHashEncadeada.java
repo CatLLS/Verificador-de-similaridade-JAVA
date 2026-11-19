@@ -45,17 +45,36 @@ public class TabelaHashEncadeada implements TabelaHash {
 
     @Override
     public void incrementar(String palavra) {
-        // TODO [Cauê - P1]:
-        //  1. i = funcaoHash.indice(palavra, buckets.length)
-        //  2. Percorrer buckets[i]: se achar a chave, frequencia++ e retornar.
-        //  3. Se não achar, inserir um novo No no início da lista e fazer tamanho++.
-        throw new UnsupportedOperationException("TODO [Cauê - P1]: TabelaHashEncadeada.incrementar");
+        if (palavra == null) {
+            throw new IllegalArgumentException("palavra não pode ser nula");
+        }
+        int i = funcaoHash.indice(palavra, buckets.length);
+        No atual = buckets[i];
+        while (atual != null) {
+            if (atual.chave.equals(palavra)) {
+                atual.frequencia++;
+                return;
+            }
+            atual = atual.proximo;
+        }
+        buckets[i] = new No(palavra, buckets[i]);
+        tamanho++;
     }
 
     @Override
     public int getFrequencia(String palavra) {
-        // TODO [Cauê - P1]: buscar no bucket; retornar 0 se não existir.
-        throw new UnsupportedOperationException("TODO [Cauê - P1]: TabelaHashEncadeada.getFrequencia");
+        if (palavra == null) {
+            return 0;
+        }
+        int i = funcaoHash.indice(palavra, buckets.length);
+        No atual = buckets[i];
+        while (atual != null) {
+            if (atual.chave.equals(palavra)) {
+                return atual.frequencia;
+            }
+            atual = atual.proximo;
+        }
+        return 0;
     }
 
     @Override
@@ -65,8 +84,16 @@ public class TabelaHashEncadeada implements TabelaHash {
 
     @Override
     public String[] getPalavras() {
-        // TODO [Cauê - P1]: percorrer todos os buckets e listas, preenchendo um array de tamanho 'tamanho'.
-        throw new UnsupportedOperationException("TODO [Cauê - P1]: TabelaHashEncadeada.getPalavras");
+        String[] resultado = new String[tamanho];
+        int idx = 0;
+        for (int i = 0; i < buckets.length; i++) {
+            No atual = buckets[i];
+            while (atual != null) {
+                resultado[idx++] = atual.chave;
+                atual = atual.proximo;
+            }
+        }
+        return resultado;
     }
 
     @Override
@@ -86,8 +113,16 @@ public class TabelaHashEncadeada implements TabelaHash {
 
     @Override
     public EstatisticasHash estatisticas() {
-        // TODO [Cauê - P1]: contar o comprimento da lista de cada bucket em um int[]
-        //  e retornar new EstatisticasHash(contagens).
-        throw new UnsupportedOperationException("TODO [Cauê - P1]: TabelaHashEncadeada.estatisticas");
+        int[] contagens = new int[buckets.length];
+        for (int i = 0; i < buckets.length; i++) {
+            int c = 0;
+            No atual = buckets[i];
+            while (atual != null) {
+                c++;
+                atual = atual.proximo;
+            }
+            contagens[i] = c;
+        }
+        return new EstatisticasHash(contagens);
     }
 }

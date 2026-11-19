@@ -1,5 +1,9 @@
 package texto;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 /**
  * Normalização obrigatória do texto.
  *
@@ -24,13 +28,29 @@ public class Normalizador {
      * @return tokens já normalizados, sem stop words (pode ser vazio)
      */
     public String[] normalizar(String texto) {
-        // TODO [Cauê - P1]:
-        //  - texto.toLowerCase(new java.util.Locale("pt", "BR"))
-        //  - trocar todo caractere que NÃO for letra ou dígito por espaço.
-        //    Character.isLetterOrDigit mantém letras acentuadas (á, ç, õ...).
-        //    Decidir (e justificar no relatório) se os acentos serão removidos.
-        //  - split por espaços ("\\s+"), descartando tokens vazios
-        //  - descartar stop words com stopWords.eStopWord(token)
-        throw new UnsupportedOperationException("TODO [Cauê - P1]: Normalizador.normalizar");
+        if (texto == null || texto.isEmpty()) {
+            return new String[0];
+        }
+
+        String minusculo = texto.toLowerCase(new Locale("pt", "BR"));
+        StringBuilder limpo = new StringBuilder(minusculo.length());
+        for (int i = 0; i < minusculo.length(); i++) {
+            char c = minusculo.charAt(i);
+            if (Character.isLetterOrDigit(c)) {
+                limpo.append(c);
+            } else {
+                limpo.append(' ');
+            }
+        }
+
+        String[] brutos = limpo.toString().split("\\s+");
+        List<String> filtrados = new ArrayList<>();
+        for (String token : brutos) {
+            if (!token.isEmpty() && (stopWords == null || !stopWords.eStopWord(token))) {
+                filtrados.add(token);
+            }
+        }
+
+        return filtrados.toArray(new String[0]);
     }
 }
