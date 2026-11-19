@@ -42,7 +42,7 @@ programa foi executado. Argumentos opcionais: `--hash=multiplicativo|polinomial`
 src/
 ├── Main.java                      fluxo principal (pacote padrão por causa do "java Main")   [P3]
 ├── app/
-│   ├── Argumentos.java            leitura dos argumentos da linha de comando (pronto)         [P3]
+│   ├── Argumentos.java            leitura dos argumentos da linha de comando (pronto)        [P3]
 │   ├── LeitorDocumentos.java      lê os .txt e monta os Documentos                           [P3]
 │   └── Saida.java                 terminal + resultado.txt (pronto)
 ├── texto/
