@@ -1,0 +1,10 @@
+bin/
+entrega/
+documentos_gerados/
+resultado.txt
+resultados_benchmark.csv
+*.class
+.idea/
+.vscode/
+*.iml
+.DS_Store
