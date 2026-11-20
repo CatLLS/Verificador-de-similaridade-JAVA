@@ -7,16 +7,6 @@ import modelo.ParDocumentos;
 
 /**
  * Árvore AVL ordenada pela similaridade.
- *
- * Responsável: Mateus (Pessoa 2)
- *
- * Requisitos do enunciado:
- *  - a chave é a similaridade; cada nó guarda uma lista de pares (chaves repetidas)
- *  - a inserção retorna um {@link RegistroRotacoes} com as rotações feitas
- *
- * Atenção com double: 0.1 + 0.2 != 0.3. Decidam como comparar chaves "iguais"
- * (usar uma tolerância EPSILON ou arredondar a similaridade, por exemplo para
- * 4 casas, antes de inserir) e expliquem no relatório.
  */
 public class ArvoreAVL implements IndiceSimilaridade {
 
@@ -34,35 +24,76 @@ public class ArvoreAVL implements IndiceSimilaridade {
     }
 
     private NoAVL inserir(NoAVL no, ParDocumentos par, RegistroRotacoes registro) {
-        // TODO [Mateus - P2]:
-        //  1. no == null -> return new NoAVL(par)
-        //  2. comparar(par.getSimilaridade(), no.chave):
-        //       < 0 -> no.esquerda = inserir(no.esquerda, ...)
-        //       > 0 -> no.direita  = inserir(no.direita, ...)
-        //      == 0 -> no.pares.add(par); return no  (não muda a altura)
-        //  3. atualizarAltura(no)
-        //  4. return balancear(no, registro)
-        throw new UnsupportedOperationException("TODO [Mateus - P2]: ArvoreAVL.inserir");
+        if (no == null) {
+            return new NoAVL(par);
+        }
+
+        int cmp = comparar(par.getSimilaridade(), no.chave);
+        if (cmp < 0) {
+            no.esquerda = inserir(no.esquerda, par, registro);
+        } else if (cmp > 0) {
+            no.direita = inserir(no.direita, par, registro);
+        } else {
+            no.pares.add(par);
+            return no;
+        }
+
+        atualizarAltura(no);
+        return balancear(no, registro);
     }
 
     private NoAVL balancear(NoAVL no, RegistroRotacoes registro) {
-        // TODO [Mateus - P2]: pelo fator de balanceamento, identificar o caso e registrar:
-        //  LL -> rotacaoDireita                                 registro.registrarSimplesDireita()
-        //  RR -> rotacaoEsquerda                                registro.registrarSimplesEsquerda()
-        //  LR -> esquerda no filho esq. + direita no nó         registro.registrarDuplaEsquerdaDireita()
-        //  RL -> direita no filho dir. + esquerda no nó         registro.registrarDuplaDireitaEsquerda()
-        //  Contem a rotação dupla como UMA dupla, não como duas simples (e expliquem no relatório).
-        throw new UnsupportedOperationException("TODO [Mateus - P2]: ArvoreAVL.balancear");
+        int fb = fatorBalanceamento(no);
+
+        if (fb > 1) {
+            if (fatorBalanceamento(no.esquerda) >= 0) {
+                registro.registrarSimplesDireita();
+                return rotacaoDireita(no);
+            } else {
+                registro.registrarDuplaEsquerdaDireita();
+                no.esquerda = rotacaoEsquerda(no.esquerda);
+                return rotacaoDireita(no);
+            }
+        }
+
+        if (fb < -1) {
+            if (fatorBalanceamento(no.direita) <= 0) {
+                registro.registrarSimplesEsquerda();
+                return rotacaoEsquerda(no);
+            } else {
+                registro.registrarDuplaDireitaEsquerda();
+                no.direita = rotacaoDireita(no.direita);
+                return rotacaoEsquerda(no);
+            }
+        }
+
+        return no;
     }
 
     private NoAVL rotacaoDireita(NoAVL y) {
-        // TODO [Mateus - P2]
-        throw new UnsupportedOperationException("TODO [Mateus - P2]: ArvoreAVL.rotacaoDireita");
+        NoAVL x = y.esquerda;
+        NoAVL t2 = x.direita;
+
+        x.direita = y;
+        y.esquerda = t2;
+
+        atualizarAltura(y);
+        atualizarAltura(x);
+
+        return x;
     }
 
     private NoAVL rotacaoEsquerda(NoAVL x) {
-        // TODO [Mateus - P2]
-        throw new UnsupportedOperationException("TODO [Mateus - P2]: ArvoreAVL.rotacaoEsquerda");
+        NoAVL y = x.direita;
+        NoAVL t2 = y.esquerda;
+
+        y.esquerda = x;
+        x.direita = t2;
+
+        atualizarAltura(x);
+        atualizarAltura(y);
+
+        return y;
     }
 
     private static int altura(NoAVL no) {
@@ -85,27 +116,79 @@ public class ArvoreAVL implements IndiceSimilaridade {
 
     @Override
     public List<ParDocumentos> buscar(double similaridade) {
-        // TODO [Mateus - P2]: busca binária normal na árvore; retornar cópia da lista do nó ou lista vazia.
-        throw new UnsupportedOperationException("TODO [Mateus - P2]: ArvoreAVL.buscar");
+        NoAVL atual = raiz;
+        while (atual != null) {
+            int cmp = comparar(similaridade, atual.chave);
+            if (cmp < 0) {
+                atual = atual.esquerda;
+            } else if (cmp > 0) {
+                atual = atual.direita;
+            } else {
+                return new ArrayList<>(atual.pares);
+            }
+        }
+        return new ArrayList<>();
     }
 
     @Override
     public List<ParDocumentos> acimaDoLimiar(double limiar) {
-        // TODO [Mateus - P2]: percurso em ordem REVERSA (direita, nó, esquerda),
-        //  cortando as subárvores esquerdas quando chave < limiar.
-        throw new UnsupportedOperationException("TODO [Mateus - P2]: ArvoreAVL.acimaDoLimiar");
+        List<ParDocumentos> saida = new ArrayList<>();
+        acimaDoLimiar(raiz, limiar, saida);
+        return saida;
+    }
+
+    private void acimaDoLimiar(NoAVL no, double limiar, List<ParDocumentos> saida) {
+        if (no == null) return;
+
+        if (comparar(no.chave, limiar) >= 0) {
+            acimaDoLimiar(no.direita, limiar, saida);
+            saida.addAll(no.pares);
+            acimaDoLimiar(no.esquerda, limiar, saida);
+        } else {
+            acimaDoLimiar(no.direita, limiar, saida);
+        }
     }
 
     @Override
     public List<ParDocumentos> topK(int k) {
-        // TODO [Mateus - P2]: percurso em ordem reversa, parando ao juntar k pares.
-        throw new UnsupportedOperationException("TODO [Mateus - P2]: ArvoreAVL.topK");
+        List<ParDocumentos> saida = new ArrayList<>();
+        if (k <= 0) return saida;
+        topK(raiz, k, saida);
+        return saida;
+    }
+
+    private void topK(NoAVL no, int k, List<ParDocumentos> saida) {
+        if (no == null || saida.size() >= k) return;
+
+        topK(no.direita, k, saida);
+
+        for (ParDocumentos par : no.pares) {
+            if (saida.size() >= k) return;
+            saida.add(par);
+        }
+
+        topK(no.esquerda, k, saida);
     }
 
     @Override
     public List<ParDocumentos> menosSimilares(int n) {
-        // TODO [Mateus - P2]: percurso em ordem normal, parando ao juntar n pares.
-        throw new UnsupportedOperationException("TODO [Mateus - P2]: ArvoreAVL.menosSimilares");
+        List<ParDocumentos> saida = new ArrayList<>();
+        if (n <= 0) return saida;
+        menosSimilares(raiz, n, saida);
+        return saida;
+    }
+
+    private void menosSimilares(NoAVL no, int n, List<ParDocumentos> saida) {
+        if (no == null || saida.size() >= n) return;
+
+        menosSimilares(no.esquerda, n, saida);
+
+        for (ParDocumentos par : no.pares) {
+            if (saida.size() >= n) return;
+            saida.add(par);
+        }
+
+        menosSimilares(no.direita, n, saida);
     }
 
     @Override
