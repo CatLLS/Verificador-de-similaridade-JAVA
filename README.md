@@ -11,27 +11,62 @@ Projeto 2 de **Projeto e Análise de Algoritmos II**, Universidade Presbiteriana
 Decisões já tomadas: **similaridade do cosseno** e **tabela hash com encadeamento externo**
 (capacidade fixa e prima, sem rehash).
 
-## Como compilar e rodar
+## Comandos para copiar e colar
 
-Requer **JDK 17+** e `make`.
+### Compilar
 
 ```bash
-make                          # compila em bin/
-make lista LIMIAR=0.75        # java Main documentos 0.75 lista
-make topk K=5 LIMIAR=0.3      # java Main documentos 0.3 topk 5
+make
+```
+
+### Executar os modos
+
+```bash
+java -cp bin Main documentos 0.75 lista
+```
+
+```bash
+java -cp bin Main documentos 0.3 topk 5
+```
+
+```bash
+java -cp bin Main documentos 0.0 busca doc01.txt doc03.txt
+```
+
+### Escolher a função hash
+
+```bash
+java -cp bin Main documentos 0.75 lista --hash=multiplicativo
+```
+
+```bash
+java -cp bin Main documentos 0.75 lista --hash=polinomial
+```
+
+### Mostrar estatísticas
+
+```bash
+java -cp bin Main documentos 0.0 lista --stats
+```
+
+```bash
+make stats
+```
+
+### Comandos Make
+
+```bash
+make lista LIMIAR=0.75
+make topk K=5 LIMIAR=0.3
 make busca A=doc01.txt B=doc03.txt
-make stats                    # colisões das 2 funções hash + rotações da AVL
-make gerar N=200              # gera um corpus sintético grande
-make benchmark                # testes de desempenho -> resultados_benchmark.csv
+make gerar N=200
+make benchmark
+make entrega
+make clean
 make help
 ```
 
-Sem make:
-
-```bash
-mkdir -p bin && javac --release 17 -encoding UTF-8 -d bin $(find src -name '*.java')
-cd bin && java Main ../documentos 0.75 lista
-```
+Requer **JDK 17+** e `make`.
 
 A saída aparece no terminal e também é gravada em `resultado.txt`, no diretório onde o
 programa foi executado. Argumentos opcionais: `--hash=multiplicativo|polinomial` e `--stats`.

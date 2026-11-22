@@ -1,9 +1,16 @@
 package app;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import hash.FuncaoHash;
+import hash.TabelaHashEncadeada;
 import modelo.Documento;
 import texto.Normalizador;
 
@@ -29,22 +36,41 @@ public class LeitorDocumentos {
      * @throws IOException se o diretório não existir ou não puder ser lido
      */
     public List<Documento> lerDiretorio(String caminho) throws IOException {
-        // TODO [Catarina - P3]:
-        //  - java.nio.file.Files.list(Path.of(caminho)), filtrando os arquivos que terminam em ".txt"
-        //  - ordenar por nome
-        //  - para cada um: lerDocumento(path)
-        //  - diretório inexistente -> lançar IOException com mensagem clara
-        throw new UnsupportedOperationException("TODO [Catarina - P3]: LeitorDocumentos.lerDiretorio");
+        Path diretorio = Path.of(caminho);
+        if (!Files.exists(diretorio)) {
+            throw new IOException("diretório inexistente: " + diretorio);
+        }
+        if (!Files.isDirectory(diretorio)) {
+            throw new IOException("caminho não é um diretório: " + diretorio);
+        }
+        if (!Files.isReadable(diretorio)) {
+            throw new IOException("diretório não pode ser lido: " + diretorio);
+        }
+
+        List<Path> arquivos = new ArrayList<>();
+        try (Stream<Path> arquivosStream = Files.list(diretorio)) {
+            arquivosStream
+                    .filter(Files::isRegularFile)
+                    .filter(arquivo -> arquivo.getFileName().toString().endsWith(".txt"))
+                    .sorted(Comparator.comparing(arquivo -> arquivo.getFileName().toString()))
+                    .forEach(arquivos::add);
+        }
+
+        List<Documento> documentos = new ArrayList<>(arquivos.size());
+        for (Path arquivo : arquivos) {
+            documentos.add(lerArquivo(arquivo));
+        }
+        return documentos;
     }
 
     /** Lê um único arquivo (usado também pelo modo busca). */
     public Documento lerArquivo(java.nio.file.Path arquivo) throws IOException {
-        // TODO [Catarina - P3]:
-        //  - Files.readString(arquivo, StandardCharsets.UTF_8)
-        //  - tokens = normalizador.normalizar(texto)
-        //  - tabela = new hash.TabelaHashEncadeada(funcaoHash, capacidadeTabela)
-        //  - tabela.incrementar(t) para cada token
-        //  - return new Documento(arquivo.getFileName().toString(), tabela, tokens.length)
-        throw new UnsupportedOperationException("TODO [Catarina - P3]: LeitorDocumentos.lerArquivo");
+        String texto = Files.readString(arquivo, StandardCharsets.UTF_8);
+        String[] tokens = normalizador.normalizar(texto);
+        TabelaHashEncadeada tabela = new TabelaHashEncadeada(funcaoHash, capacidadeTabela);
+        for (String token : tokens) {
+            tabela.incrementar(token);
+        }
+        return new Documento(arquivo.getFileName().toString(), tabela, tokens.length);
     }
 }
