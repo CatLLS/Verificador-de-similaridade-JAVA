@@ -1,4 +1,0 @@
-=== VERIFICADOR DE SIMILARIDADE DE TEXTOS ===
-Comparando: doc01.txt <-> doc03.txt
-Similaridade calculada: 0.94
-Métrica utilizada: Cosseno
