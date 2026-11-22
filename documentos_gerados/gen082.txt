@@ -1,0 +1,1 @@
+Se eu e você, nós, com eles... O bubble sort e o insertion sort são simples, mas têm complexidade quadrática no pior caso. Árvores balanceadas oferecem busca logarítmica no pior caso, e tabelas de dispersão alcançam, em média, tempo constante. A gravidade do Sol mantém esses corpos em órbitas elípticas, e a luz solar leva cerca de oito minutos para chegar à Terra.

@@ -1,0 +1,1 @@
+Pratos como o feijão o com o tutu de são servidos em a lenha por estado. As estruturas de dados são formas de organizar armazenar informações na memória do computador para ser usadas com eficiência. Uma hash, por exemplo, permite médio constante, enquanto uma árvore balanceada garante buscas em tempo logarítmico mesmo caso.
